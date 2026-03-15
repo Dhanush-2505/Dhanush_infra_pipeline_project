@@ -9,7 +9,7 @@ module "vpc" {
 module "ec2" {
   source            = "../../modules/ec2"
   ami_id            = "ami-0ed0867532b47cc2c"
-  instance_type     = "t2.micro"
+  instance_type     = "t3.micro"
   subnet_id         = module.vpc.subnet_id
   ec2_count         = 2
   env               = "dev"
