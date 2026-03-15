@@ -6,9 +6,9 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "infra-pipeline-bu"
+    bucket = "mt-terra-buc"
     key    = "environments/dev/terraform.tfstate"
-    region = "ap-southeast-1"
+    region = "ap-south-1"
   }
 }
 
