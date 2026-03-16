@@ -2,10 +2,11 @@
 
 ## Project Overview
 
-This project demonstrates a complete Infrastructure as Code (IaC) pipeline using **Terraform**, **Jenkins**, and **GitHub**.
-The pipeline automatically provisions AWS infrastructure for different environments such as **dev** and **prod**.
+This project demonstrates an end-to-end **Infrastructure as Code (IaC) CI/CD pipeline** using **Terraform, Jenkins, GitHub, and AWS**.
 
-The setup follows a typical DevOps workflow where infrastructure changes are managed through Git and automatically deployed using Jenkins pipelines.
+Infrastructure changes are managed through Git, automatically triggered through GitHub webhooks, and deployed using a Jenkins pipeline.
+
+The project also implements **remote Terraform state management using Amazon S3** and **state locking using DynamoDB**, which are recommended best practices for team-based Terraform workflows.
 
 ---
 
@@ -21,10 +22,15 @@ Terraform Execution
 ↓
 AWS Infrastructure
 
-Infrastructure State Management:
+### Terraform Backend Architecture
 
-Terraform → S3 Backend
-State Locking → DynamoDB
+Terraform
+↓
+Amazon S3 (Remote State Storage)
+↓
+DynamoDB (State Locking)
+
+This setup prevents multiple users or pipelines from modifying the infrastructure state simultaneously.
 
 ---
 
@@ -71,11 +77,13 @@ iac_pipeline_project
 
 # Terraform Backend
 
-Terraform state is stored remotely using an **S3 bucket**.
+Terraform state is stored remotely using an **Amazon S3 bucket** instead of being stored locally.
 
-State locking is handled using **DynamoDB** to prevent multiple users from modifying the state simultaneously.
+This enables multiple users or CI/CD pipelines to share the same infrastructure state safely.
 
-Example backend configuration:
+To prevent concurrent infrastructure updates, **DynamoDB is used for Terraform state locking**.
+
+### Backend Configuration Example
 
 ```
 terraform {
@@ -93,11 +101,11 @@ terraform {
 
 # Jenkins Pipeline Stages
 
-The Jenkins pipeline consists of the following stages:
+The Jenkins pipeline automates infrastructure deployment using the following stages:
 
 ### 1. Checkout
 
-Fetches the latest Terraform code from GitHub.
+Fetches the latest Terraform code from the GitHub repository.
 
 ### 2. Terraform Init
 
@@ -105,27 +113,27 @@ Initializes Terraform and configures the remote backend.
 
 ### 3. Terraform Plan
 
-Generates an execution plan showing what infrastructure changes will occur.
+Generates an execution plan that shows the infrastructure changes.
 
 ### 4. Manual Approval
 
-Requires manual approval before applying infrastructure changes.
+Requires manual approval before infrastructure changes are applied.
 
 ### 5. Terraform Apply
 
-Creates or updates infrastructure on AWS.
+Applies the Terraform plan and provisions infrastructure in AWS.
 
 ---
 
 # Infrastructure Created
 
-Terraform provisions the following resources:
+Terraform provisions the following AWS resources:
 
-* AWS VPC
-* AWS Subnet
+* VPC
+* Subnet
 * EC2 Instances
 
-Example configuration:
+### Example Configuration
 
 ```
 Instance Type : t3.micro
@@ -137,18 +145,18 @@ Region        : ap-south-1
 
 # CI/CD Workflow
 
-1. Developer pushes code to GitHub.
-2. GitHub webhook triggers Jenkins.
+1. Developer pushes infrastructure code to GitHub.
+2. GitHub webhook triggers Jenkins automatically.
 3. Jenkins Multibranch Pipeline detects the branch.
 4. Terraform plan is generated.
-5. Manual approval is requested.
-6. Infrastructure is deployed to AWS.
+5. Manual approval is required before deployment.
+6. Terraform apply provisions infrastructure in AWS.
 
 ---
 
 # Environments
 
-The project supports multiple environments.
+The project supports multiple environments:
 
 ### Development Environment
 
@@ -158,7 +166,7 @@ Used for testing infrastructure changes.
 
 Used for deploying production infrastructure.
 
-Each environment has its own Terraform configuration.
+Each environment has its own Terraform configuration and backend state.
 
 ---
 
@@ -176,7 +184,7 @@ Initialize Terraform:
 terraform init
 ```
 
-Generate plan:
+Generate execution plan:
 
 ```
 terraform plan
@@ -192,18 +200,18 @@ terraform apply
 
 # Future Improvements
 
-Possible improvements for this project:
+Possible enhancements for this project:
 
 * Add Terraform validation stage
-* Implement security scanning
-* Add automated destroy stage
-* Separate AWS accounts for environments
-* Use Jenkins shared libraries
+* Implement security scanning using tools like tfsec
+* Add automated destroy pipeline
+* Separate AWS accounts for dev and prod
+* Implement Jenkins shared libraries
 
 ---
 
 # Author
 
 Dhanush
-
 DevOps / Cloud Engineer
+dhanushnd2003@gmail.com
